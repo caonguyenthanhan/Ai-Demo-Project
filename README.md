@@ -164,6 +164,8 @@ project-root/
 ├── app/                  # Next.js App Router
 │   ├── api/              # API routes
 │   │   └── chat/         # Chat API endpoint
+│   │   └── proxy/        # Proxy API endpoint
+│   │       └── {model}   # Model-specific proxy endpoint
 │   ├── globals.css       # Global styles
 │   ├── layout.tsx        # Root layout
 │   ├── page.tsx          # Home page
@@ -304,3 +306,10 @@ DEEPSEEK_API_KEY=...
 ## Lưu ý
 - Không cần cài đặt SDK AI ở frontend
 - Chỉ cần sửa service frontend gọi đúng endpoint proxy
+
+## Hướng dẫn sử dụng AIMLAPI
+
+- Để sử dụng AIMLAPI, bạn cần nhập API key hợp lệ vào Settings > API Keys > AIMLAPI.
+- Khi gửi tin nhắn, chỉ gửi các trường `role` và `content` cho từng message (không gửi id, timestamp, model).
+- Hệ thống sẽ tự động proxy request qua backend để đảm bảo bảo mật và không bị lỗi CORS/CSP.
+- Nếu gặp lỗi 401 hoặc 400, kiểm tra lại API key và cấu trúc message.

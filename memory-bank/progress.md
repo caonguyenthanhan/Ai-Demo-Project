@@ -8,6 +8,7 @@
 5. Hoàn thiện backend proxy cho tất cả model AI chính (OpenAI, Gemini, Claude, DeepSeek, Grok, AIMLAPI)
 6. Frontend đã chuyển sang gọi proxy, không còn gọi trực tiếp API ngoài
 7. Đã cập nhật README và activeContext
+8. Đã hoàn thiện API proxy AIMLAPI, chuẩn hóa cấu trúc message, đồng bộ UI Settings, xử lý lỗi 401/400.
 
 ## Đang thực hiện
 1. Thiết lập môi trường phát triển

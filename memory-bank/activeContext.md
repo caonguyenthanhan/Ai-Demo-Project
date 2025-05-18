@@ -48,6 +48,7 @@
 - Toàn bộ lệnh gọi API AI đã chuyển sang backend proxy (app/api/proxy/{model}/route.ts)
 - API key lấy từ .env.local, không lộ ra frontend, không bị CORS/CSP
 - Đã hoàn thiện proxy cho các model: OpenAI, Gemini, Claude, DeepSeek, Grok, AIMLAPI
+- Đã hoàn thiện logic proxy AIMLAPI, chuẩn hóa message, UI Settings đồng nhất, không còn lỗi cấu trúc hoặc key.
 
 ## Hướng dẫn sử dụng
 - Đặt key vào .env.local

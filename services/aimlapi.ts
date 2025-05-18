@@ -19,4 +19,6 @@ export async function callAIMLAPI(messages: any[]) {
     if (!response.ok) throw new Error(result.error || "Unknown error")
     return result.content || result.choices?.[0]?.message?.content || result.message
   } catch (error: any) {
-    throw new Error(`Failed to pr
+    throw new Error(`Failed to process request with AIMLAPI: ${error.message}`)
+  }
+}
