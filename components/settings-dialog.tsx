@@ -20,36 +20,38 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const { toast } = useToast()
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({})
   const [authorName, setAuthorName] = useState("Your Name")
+  const [n8nApiUrl, setN8nApiUrl] = useState("")
+  const [finetuneModelPath, setFinetuneModelPath] = useState("")
+  const [finetuneKbPath, setFinetuneKbPath] = useState("")
 
   // Load API keys khi component mount
   useEffect(() => {
     if (isOpen) {
-      // Tải tất cả API keys từ localStorage
       loadAllApiKeys()
-
-      // Cập nhật state với các API keys đã tải
       const keys: Record<string, string> = {}
       defaultModels.forEach((model) => {
         keys[model.id] = loadApiKey(model.id)
       })
-
       setApiKeys(keys)
-
-      // Tải tên tác giả từ localStorage
       const savedAuthorName = localStorage.getItem("ai_models_chatbox_author_name")
       if (savedAuthorName) {
         setAuthorName(savedAuthorName)
       }
+      const savedN8nApiUrl = localStorage.getItem("N8N_API_URL")
+      if (savedN8nApiUrl) setN8nApiUrl(savedN8nApiUrl)
+      const savedFinetuneModelPath = localStorage.getItem("FINETUNE_MODEL_PATH")
+      if (savedFinetuneModelPath) setFinetuneModelPath(savedFinetuneModelPath)
+      const savedFinetuneKbPath = localStorage.getItem("FINETUNE_KB_PATH")
+      if (savedFinetuneKbPath) setFinetuneKbPath(savedFinetuneKbPath)
     }
   }, [isOpen])
 
   const handleSaveSettings = () => {
-    // Lưu tất cả API keys
     saveAllApiKeys(apiKeys)
-
-    // Lưu tên tác giả
     localStorage.setItem("ai_models_chatbox_author_name", authorName)
-
+    localStorage.setItem("N8N_API_URL", n8nApiUrl)
+    localStorage.setItem("FINETUNE_MODEL_PATH", finetuneModelPath)
+    localStorage.setItem("FINETUNE_KB_PATH", finetuneKbPath)
     toast({
       title: "Settings saved",
       description: "Your API keys and preferences have been saved successfully.",
@@ -83,7 +85,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
           </TabsList>
 
           <TabsContent value="api-keys" className="space-y-4 mt-4">
-            <div className="space-y-4">
+            <div className="max-h-[60vh] overflow-y-auto space-y-4">
               {defaultModels.map((model) => (
                 <div key={model.id} className="space-y-2">
                   <Label htmlFor={`api-key-${model.id}`}>
@@ -119,7 +121,6 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 </div>
               ))}
             </div>
-
             <div className="flex justify-end">
               <Button onClick={handleSaveSettings}>Save Settings</Button>
             </div>
@@ -135,7 +136,33 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 onChange={(e) => setAuthorName(e.target.value)}
               />
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="n8n-api-url">N8N_API_URL</Label>
+              <Input
+                id="n8n-api-url"
+                placeholder="Enter N8N API URL"
+                value={n8nApiUrl}
+                onChange={(e) => setN8nApiUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="finetune-model-path">FINETUNE_MODEL_PATH</Label>
+              <Input
+                id="finetune-model-path"
+                placeholder="Enter Fine-tune Model Path"
+                value={finetuneModelPath}
+                onChange={(e) => setFinetuneModelPath(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="finetune-kb-path">FINETUNE_KB_PATH</Label>
+              <Input
+                id="finetune-kb-path"
+                placeholder="Enter Fine-tune Knowledge Base Path"
+                value={finetuneKbPath}
+                onChange={(e) => setFinetuneKbPath(e.target.value)}
+              />
+            </div>
             <div className="flex justify-end">
               <Button onClick={handleSaveSettings}>Save Settings</Button>
             </div>

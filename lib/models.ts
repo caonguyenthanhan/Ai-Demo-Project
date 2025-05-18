@@ -69,4 +69,36 @@ export const defaultModels: AIModel[] = [
     websiteUrl: "https://www.cursor.com/",
     redirectToWebsite: true, // Chỉ định rằng nên chuyển hướng đến trang web
   },
+  {
+    id: "general",
+    name: "General",
+    description: "General AI chatbox for basic conversations",
+    icon: Sparkles,
+    apiKeyName: "",
+    websiteUrl: "",
+  },
+  {
+    id: "domain",
+    name: "Domain",
+    description: "Domain-based AI chatbox for specialized tasks",
+    icon: BrainCircuit,
+    apiKeyName: "",
+    websiteUrl: "",
+  },
+  {
+    id: "finetuned",
+    name: "Fine-tuned Model",
+    description: "Fine-tuned AI chatbox for custom tasks",
+    icon: Bot,
+    apiKeyName: "",
+    websiteUrl: "",
+  },
+  {
+    id: "aimlapi",
+    name: "AIMLAPI",
+    description: "AIMLAPI for general chat and completions",
+    icon: Sparkles,
+    apiKeyName: "AIMLAPI_API_KEY",
+    websiteUrl: "https://aimlapi.com/",
+  },
 ]

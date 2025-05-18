@@ -1,22 +1,25 @@
 "use client"
 
 import type React from "react"
-
 import type { Message, AIModel } from "@/lib/types"
 import { Avatar } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { formatTimestamp } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { useTheme } from "next-themes"
 
 interface ChatMessagesProps {
   messages: Message[]
   isLoading: boolean
   selectedModel: AIModel
-  messagesEndRef: React.RefObject<HTMLDivElement>
+  messagesEndRef: React.RefObject<HTMLDivElement | null>
 }
 
 export function ChatMessages({ messages, isLoading, selectedModel, messagesEndRef }: ChatMessagesProps) {
+  const { theme } = useTheme()
+  const isDarkTheme = theme === "dark"
+
   return (
     <ScrollArea className="h-full p-4">
       {messages.length === 0 ? (
@@ -44,21 +47,19 @@ export function ChatMessages({ messages, isLoading, selectedModel, messagesEndRe
                   )}
                 </Avatar>
                 <div
-                  className={`rounded-lg px-4 py-2 ${
-                    message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  className={`rounded-lg px-4 py-2 text-xs mt-1 ${ // Moved text-xs and mt-1 here
+                    message.role === "user"
+                      ? isDarkTheme
+                        ? "bg-primary text-black/70" // Dark mode: black text with opacity
+                        : "bg-primary text-white/70" // Light mode: white text with opacity
+                      : "bg-muted text-muted-foreground" // Use text-muted-foreground for model
                   }`}
                 >
-                  <div className="prose dark:prose-invert prose-sm max-w-none">
+                  <div className="max-w-none" style={{ color: "inherit", opacity: "inherit" }}>
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
-                  <div
-                    className={`text-xs mt-1 ${
-                      message.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground"
-                    }`}
-                  >
-                    {formatTimestamp(message.timestamp)}
-                    {message.model && ` · ${message.model}`}
-                  </div>
+                  {formatTimestamp(message.timestamp)}
+                  {message.model && ` · ${message.model}`}
                 </div>
               </div>
             </div>

@@ -53,6 +53,16 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Thêm các màu mới cho workflow
+        blue: {
+          500: "#3b82f6",
+        },
+        green: {
+          500: "#22c55e",
+        },
+        purple: {
+          500: "#a855f7",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

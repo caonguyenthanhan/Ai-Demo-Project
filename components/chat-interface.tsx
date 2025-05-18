@@ -8,12 +8,22 @@ import { ChatInput } from "@/components/chat-input"
 import { useSidebar } from "@/components/sidebar-provider"
 import type { AIModel, Message } from "@/lib/types"
 import { defaultModels } from "@/lib/models"
+import { callOpenAI } from "@/services/openai"
+import { callGemini } from "@/services/gemini"
+import { callClaude } from "@/services/claude"
+import { callDeepSeek } from "@/services/deepseek"
+import { callGrok } from "@/services/grok"
+import { callAIMLAPI } from "@/services/aimlapi"
+import { callContextAPI } from "@/services/contextapi"
+import { callDomainAPI } from "@/services/domainapi"
+import { callFineTunedAPI } from "@/services/finetuned"
 
 export function ChatInterface() {
   const { isSidebarOpen } = useSidebar()
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState<AIModel>(defaultModels[0])
+  const [selectedChatbox, setSelectedChatbox] = useState("general")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -21,6 +31,13 @@ export function ChatInterface() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [messages])
+
+  useEffect(() => {
+    // Nếu selectedChatbox là 1 model id thì đổi selectedModel
+    const model = defaultModels.find(m => m.id === selectedChatbox)
+    if (model) setSelectedModel(model)
+    // Nếu là 4 chatbox đầu thì không đổi model
+  }, [selectedChatbox])
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return
@@ -58,44 +75,65 @@ export function ChatInterface() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: content,
-          model: selectedModel.id,
-          history: messages,
-        }),
-      })
+      let response: string
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to get response")
+      // Gọi API tương ứng với model được chọn
+      switch (selectedModel.id) {
+        case "openai":
+          response = await callOpenAI([...messages, userMessage])
+          break
+        case "gemini":
+          response = await callGemini([...messages, userMessage])
+          break
+        case "claude":
+          response = await callClaude([...messages, userMessage])
+          break
+        case "deepseek":
+          response = await callDeepSeek([...messages, userMessage])
+          break
+        case "grok":
+          response = await callGrok([...messages, userMessage])
+          break
+        case "aiml":
+          response = await callAIMLAPI([...messages, userMessage], localStorage.getItem("AIMLAPI_API_KEY") ?? "")
+          break
+        case "context":
+          response = await callContextAPI([...messages, userMessage], localStorage.getItem("N8N_API_URL") ?? "")
+          break
+        case "domain":
+          response = await callDomainAPI([...messages, userMessage], localStorage.getItem("N8N_API_URL") ?? "")
+          break
+        case "finetuned":
+          response = await callFineTunedAPI(
+            [...messages, userMessage],
+            localStorage.getItem("N8N_API_URL") ?? "",
+            localStorage.getItem("FINETUNE_MODEL_PATH") ?? "",
+            localStorage.getItem("FINETUNE_KB_PATH") ?? ""
+          )
+          break
+        case "general":
+          response = await callAIMLAPI([...messages, userMessage], localStorage.getItem("AIMLAPI_API_KEY") ?? "")
+          break
+        default:
+          throw new Error(`Model ${selectedModel.id} is not supported yet.`)
       }
-
-      const data = await response.json()
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.response,
+        content: response,
         timestamp: new Date(),
         model: selectedModel.name,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error)
 
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content:
-          error instanceof Error
-            ? error.message
-            : "Sorry, there was an error processing your request. Please check your API configuration and try again.",
+        content: error.message || "Sorry, there was an error processing your request. Please check your API configuration and try again.",
         timestamp: new Date(),
         model: selectedModel.name,
       }
@@ -124,6 +162,8 @@ export function ChatInterface() {
         selectedModel={selectedModel}
         onSelectModel={handleSelectModel}
         onClearChat={handleClearChat}
+        selectedChatbox={selectedChatbox}
+        onSelectChatbox={setSelectedChatbox}
       />
       <div className={`flex flex-col flex-1 h-full transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
         <ChatHeader />

@@ -12,7 +12,7 @@ export interface AIModel {
 
 export interface Message {
   id: string
-  role: "user" | "assistant" | "system"
+  role: "user" | "assistant"
   content: string
   timestamp: Date
   model?: string

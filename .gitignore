@@ -25,3 +25,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+./phobert-finetuned-viquad2
+./knowledge_base.csv 
+./app/chat-box
+app.py

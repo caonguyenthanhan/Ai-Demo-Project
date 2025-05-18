@@ -30,11 +30,6 @@ Dự án này cung cấp một giao diện chat thống nhất cho phép ngườ
    ```bash
    git clone https://github.com/your-username/ai-models-chatbox.git
    cd ai-models-chatbox
-Tôi sẽ tạo một file README.md để hướng dẫn sử dụng dự án:
-
-```markdown project="AI Models Chatbox" file="README.md"
-...
-```
 
 2. Cài đặt các dependencies:
 
@@ -133,10 +128,6 @@ Bạn có thể cấu hình API keys thông qua biến môi trường:
 ## Cách sử dụng
 
 ### Giao diện chính
-
-
-
-
 
 1. **Sidebar**: Hiển thị danh sách các mô hình AI có sẵn
 2. **Chat Area**: Hiển thị lịch sử chat
@@ -261,9 +252,8 @@ Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LI
 
 ## Tác giả
 
-- **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/ycaonguyenthanhan)
-- **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/ycaonguyenthanhan)
-
+- **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/caonguyenthanhan)
+- **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/caonguyenthanhan)
 
 ## Lời cảm ơn
 
@@ -271,3 +261,46 @@ Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LI
 - [shadcn/ui](https://ui.shadcn.com/) - Thư viện UI components
 - [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
 - [Vercel AI SDK](https://sdk.vercel.ai/) - SDK cho tích hợp AI
+
+# AI Demo Project
+
+## Proxy Backend cho AI API
+
+Tất cả lệnh gọi API AI (OpenAI, Gemini, Claude, DeepSeek, Grok, AIMLAPI) đều đi qua backend proxy:
+- Mỗi model có route riêng: `app/api/proxy/{model}/route.ts`
+- Frontend chỉ gọi `/api/proxy/{model}`
+- API key lấy từ biến môi trường server, không lộ ra frontend, không bị CORS/CSP
+
+### Cấu hình biến môi trường
+Tạo file `.env.local` với nội dung:
+```
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=...
+AIMLAPI_API_KEY=...
+GROK_API_KEY=...
+CLAUDE_API_KEY=...
+DEEPSEEK_API_KEY=...
+```
+
+### Lợi ích
+- Bảo mật key tuyệt đối
+- Không bị lỗi CORS, CSP
+- Dễ mở rộng cho các model AI khác
+
+### Khởi động lại server sau khi thay đổi key
+
+---
+
+## Các route proxy đã có:
+- `/api/proxy/openai`
+- `/api/proxy/gemini`
+- `/api/proxy/aimlapi`
+- `/api/proxy/grok`
+- `/api/proxy/claude`
+- `/api/proxy/deepseek`
+
+---
+
+## Lưu ý
+- Không cần cài đặt SDK AI ở frontend
+- Chỉ cần sửa service frontend gọi đúng endpoint proxy
