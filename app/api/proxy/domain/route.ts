@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import 'dotenv/config';
 import axios from 'axios';
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "YOUR_GEMINI_API_KEY";
+
+// Lấy N8N_WEBHOOK_URL từ biến môi trường
+const N8N_WEBHOOK_URL = process.env.DOMAIN_API_KEY;
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,6 +15,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: "Message and sessionId are required" },
         { status: 400 }
+      );
+    }
+
+    // Kiểm tra N8N_WEBHOOK_URL có tồn tại
+    if (!N8N_WEBHOOK_URL) {
+      return NextResponse.json(
+        { error: "N8N_WEBHOOK_URL is not configured. Please set it in Settings." },
+        { status: 500 }
       );
     }
 
