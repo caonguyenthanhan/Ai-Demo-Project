@@ -23,14 +23,28 @@ pnpm install
 ```
 
 ### 3. Tạo file môi trường
-Tạo file `.env.local` trong thư mục gốc của dự án và thêm các API keys:
-```plaintext
-OPENAI_API_KEY=your_openai_api_key
-GEMINI_API_KEY=your_gemini_api_key
-GROK_API_KEY=your_grok_api_key
-CLAUDE_API_KEY=your_claude_api_key
-DEEPSEEK_API_KEY=your_deepseek_api_key
+Tạo file `.env.local` trong thư mục gốc của dự án:
+
+```powershell
+# Windows PowerShell
+New-Item .env.local -ItemType File
+
+# Hoặc tạo file trống với nội dung mặc định
+@"
+# Các API keys có thể được cấu hình ở đây hoặc thông qua giao diện Settings
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+GROK_API_KEY=
+CLAUDE_API_KEY=
+DEEPSEEK_API_KEY=
+"@ | Out-File -FilePath .env.local -Encoding UTF8
 ```
+
+Lưu ý:
+- File `.env.local` có thể để trống
+- Bạn có thể cấu hình API keys thông qua giao diện Settings của ứng dụng
+- Các API keys được lưu an toàn trong localStorage của trình duyệt
+- Bạn có thể thay đổi API keys bất kỳ lúc nào thông qua Settings
 
 ### 4. Chạy ứng dụng ở môi trường development
 ```powershell
@@ -76,9 +90,10 @@ PORT=3001
 ### 3. Lỗi API key không hợp lệ
 - Kiểm tra lại các API keys trong file `.env.local`
 - Đảm bảo các API keys có quyền truy cập hợp lệ
+- Hoặc cấu hình API keys thông qua giao diện Settings
 
 ## Liên hệ hỗ trợ
 Nếu bạn gặp vấn đề trong quá trình cài đặt, vui lòng:
 1. Kiểm tra [Issues](https://github.com/caonguyenthanhan/Ai-Demo-Project/issues)
 2. Tạo issue mới nếu chưa có giải pháp
-3. Liên hệ qua email: support@example.com 
+3. Liên hệ qua email: caonguyenthanhan.aaa@gmail.com
