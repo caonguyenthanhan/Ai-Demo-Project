@@ -9,6 +9,7 @@ Dự án này cung cấp một giao diện chat thống nhất cho phép ngườ
 ### Tính năng chính
 
 - **Hỗ trợ nhiều mô hình AI**: ChatGPT, Gemini, Grok, v0 by Vercel, Claude AI, DeepSeek, Copilot, và Cursor
+- **Fine-tuned QA Chatbox**: Tích hợp mô hình câu hỏi-đáp được fine-tune trên dữ liệu tiếng Việt
 - **Giao diện người dùng hiện đại**: Giao diện dễ sử dụng với chế độ sáng/tối
 - **Quản lý API keys**: Quản lý tập trung API keys thông qua file cấu hình hoặc giao diện cài đặt
 - **Chuyển hướng thông minh**: Tự động chuyển hướng đến trang web chính thức cho các dịch vụ không có API công khai
@@ -50,6 +51,7 @@ GEMINI_API_KEY=your_gemini_api_key
 GROK_API_KEY=your_grok_api_key
 CLAUDE_API_KEY=your_claude_api_key
 DEEPSEEK_API_KEY=your_deepseek_api_key
+AIMLAPI_API_KEY=your_aimlapi_key
 ```
 
 
@@ -114,13 +116,22 @@ Lưu ý:
 - API keys sẽ được lưu an toàn trong localStorage của trình duyệt
 - Các keys cũng được tự động lưu vào file `.env.local` để backend sử dụng
 - Một số mô hình (v0, Copilot, Cursor) không yêu cầu API key và sẽ chuyển hướng đến trang web chính thức
-- General API Chatbox sử dụng AIMLAPI
+- General API Chatbox sử dụng AIMLAPI (https://aimlapi.com/app/keys/)
 - Domain-based Chatbox sử dụng N8N webhook
 - Fine-tuned Chatbox sử dụng mô hình local, không cần API key
 
 ### 2. Thông qua file .env.local
 
 Bạn có thể cấu hình API keys thông qua biến môi trường:
+
+```plaintext
+OPENAI_API_KEY=your_openai_api_key
+GEMINI_API_KEY=your_gemini_api_key
+GROK_API_KEY=your_grok_api_key
+CLAUDE_API_KEY=your_claude_api_key
+DEEPSEEK_API_KEY=your_deepseek_api_key
+AIMLAPI_API_KEY=your_aimlapi_key
+```
 
 - Trong phát triển cục bộ: Sử dụng file `.env.local`
 - Trong sản xuất: Cấu hình biến môi trường trên nền tảng triển khai của bạn (ví dụ: Vercel)
@@ -325,3 +336,116 @@ DEEPSEEK_API_KEY=...
 - Khi gửi tin nhắn, chỉ gửi các trường `role` và `content` cho từng message (không gửi id, timestamp, model).
 - Hệ thống sẽ tự động proxy request qua backend để đảm bảo bảo mật và không bị lỗi CORS/CSP.
 - Nếu gặp lỗi 401 hoặc 400, kiểm tra lại API key và cấu trúc message.
+
+## Tải và cấu hình mô hình Fine-tuned (phobert-finetuned-viquad2) và Knowledge Base
+
+### 1. Sử dụng chức năng Download Models trên UI
+- Vào phần **Settings > API Keys**.
+- Nhấn nút **Download Models** để tự động tải và giải nén model cùng knowledge base từ Google Drive về thư mục `models`.
+- Đường dẫn sẽ được cập nhật tự động vào file `.env.local`.
+
+### 2. Yêu cầu hệ thống
+- Máy cần cài đặt **Python 3** và thư viện **gdown**:
+  ```sh
+  pip install gdown
+  ```
+- Script sẽ tự động gọi `gdown` để tải folder từ Google Drive nếu không tìm thấy file `models.zip` trong thư mục `public`.
+
+### 3. Cách hoạt động tự động
+- Nếu có file `public/models.zip` → script sẽ giải nén vào thư mục `models`.
+- Nếu không có file zip, script sẽ tự động tải folder từ Google Drive: [Tải model tại đây](https://drive.google.com/drive/folders/1vi95ZM9cfAD75l1NpoMjEo-X4wQZperD?usp=sharing)
+- Sau khi tải hoặc giải nén xong, script sẽ tự động cập nhật các biến môi trường:
+  - `FINETUNE_MODEL_PATH=./models/phobert-finetuned-viquad2`
+  - `FINETUNE_KB_PATH=./models/knowledge_base.csv`
+
+### 4. Tùy chọn: Tạo file models.zip thủ công (dùng offline)
+- Nếu muốn sử dụng offline, bạn có thể tự tạo file `models.zip` chứa:
+  - Thư mục `phobert-finetuned-viquad2`
+  - File `knowledge_base.csv`
+- Đặt file `models.zip` vào thư mục `public` của dự án.
+- Khi nhấn Download Models, script sẽ giải nén file này thay vì tải từ Google Drive.
+
+### 5. Lưu ý
+- Nếu gặp lỗi về quyền truy cập hoặc thiếu file, kiểm tra lại vị trí và tên file/thư mục.
+- Đảm bảo đã cài Python và gdown trước khi sử dụng chức năng này.
+
+## Câu hỏi thường gặp (FAQ)
+
+### 1. Lấy Hugging Face API Token và model_id, điền vào biến môi trường như thế nào?
+
+- **API Token:**
+  1. Truy cập [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+  2. Nhấn "New token" để tạo token mới (chọn quyền "Read")
+  3. Sao chép token, ví dụ: `hf_xxxxxxxxxxxxxxxxxxxxx`
+
+- **Model ID:**
+  - Là tên model trên Hugging Face Hub, ví dụ: `An-CNT/phobert-finetuned-viquad2` hoặc `deepset/roberta-base-squad2`
+  - Xem trên URL model: `https://huggingface.co/An-CNT/phobert-finetuned-viquad2`
+
+- **Khai báo vào biến môi trường:**
+  - Thêm vào file `.env.local` ở thư mục gốc dự án:
+    ```env
+    HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxx
+    HF_MODEL_ID=An-CNT/phobert-finetuned-viquad2
+    ```
+  - Hoặc cấu hình biến môi trường tương ứng trên nền tảng deploy (Vercel, Docker, ...)
+
+### 2. Định dạng knowledge base và vị trí đặt file
+
+- **Định dạng knowledge base:**
+  - File CSV, mã hóa UTF-8, có ít nhất 2 cột: `Category` và `Answer`
+  - Ví dụ mẫu:
+    ```csv
+    Category,Answer
+    FAQ,Trường Đại học Bách Khoa được thành lập năm 1957.
+    SP,Chuyên ngành Khoa học Máy tính đào tạo các kiến thức về lập trình, AI, dữ liệu lớn...
+    EVEN,Lịch thi học kỳ sẽ được công bố vào đầu tháng 6.
+    FAQ,Trường có nhiều câu lạc bộ học thuật và kỹ năng mềm.
+    ```
+- **Vị trí đặt file:**
+  - Mặc định: `./models/knowledge_base.csv` (tức là thư mục `models` trong root dự án)
+  - Có thể thay đổi đường dẫn bằng biến môi trường trong `.env.local`:
+    ```env
+    FINETUNE_KB_PATH=./models/knowledge_base.csv
+    ```
+- **Lưu ý:**
+  - Đảm bảo file CSV không có BOM, không có dòng trống đầu/cuối.
+  - Nếu deploy server, cần upload file knowledge base lên đúng vị trí cấu hình.
+
+### Fine-tuned QA Chatbox
+
+Fine-tuned QA Chatbox là một tính năng đặc biệt sử dụng mô hình ngôn ngữ được fine-tune trên dữ liệu tiếng Việt để trả lời câu hỏi chính xác và phù hợp với ngữ cảnh.
+
+#### Cấu hình Fine-tuned QA Chatbox
+
+1. **Hugging Face API Token**
+   - Truy cập [Hugging Face](https://huggingface.co/settings/tokens) để tạo API token
+   - Thêm token vào Settings với key `HF_TOKEN`
+
+2. **Model và Knowledge Base**
+   - Model ID mặc định: `An-CNT/phobert-finetuned-viquad2`
+   - Knowledge base path mặc định: `./models/knowledge_base.csv`
+   - Các giá trị này được cố định và không thể thay đổi trong UI
+
+3. **Định dạng Knowledge Base**
+   - File CSV với các cột: question, answer, category
+   - Categories hỗ trợ: FAQ, SP (Special), EVEN (Event)
+   - Tải knowledge base từ Google Drive đã cung cấp
+
+4. **Biến môi trường**
+   ```plaintext
+   HF_TOKEN=your_huggingface_token
+   HF_MODEL_ID=An-CNT/phobert-finetuned-viquad2
+   FINETUNE_KB_PATH=./models/knowledge_base.csv
+   ```
+
+#### Luồng hoạt động
+
+1. Người dùng gửi câu hỏi
+2. Hệ thống phân loại câu hỏi (FAQ, SP, EVEN)
+3. Lấy context phù hợp từ knowledge base
+4. Gọi Hugging Face Inference API để sinh câu trả lời
+5. Trả về kết quả bao gồm:
+   - Câu trả lời
+   - Độ tin cậy
+   - Loại câu hỏi

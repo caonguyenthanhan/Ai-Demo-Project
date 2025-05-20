@@ -19,12 +19,24 @@ export async function callAIMLAPI(messages: any[]) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
-      body: JSON.stringify({ messages: cleanMessages })
+      body: JSON.stringify({ 
+        messages: cleanMessages,
+        model: "gpt-3.5-turbo",
+        temperature: 0.7,
+        max_tokens: 1000,
+        stream: false
+      })
     })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+    }
+
     const result = await response.json()
-    if (!response.ok) throw new Error(result.error || "Unknown error")
-    return result.content || result.choices?.[0]?.message?.content || result.message
+    return result.choices?.[0]?.message?.content || result.content || result.message
   } catch (error: any) {
+    console.error('AIMLAPI Error:', error)
     throw new Error(`Failed to process request with AIMLAPI: ${error.message}`)
   }
 }

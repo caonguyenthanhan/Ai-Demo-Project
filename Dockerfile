@@ -17,8 +17,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Tạo file .env.local mặc định
-RUN echo "# API Keys Configuration" > .env.local
+# Tạo file .env.local mặc định với các biến môi trường cần thiết
+RUN echo "# API Keys Configuration" > .env.local && \
+    echo "HF_MODEL_ID=An-CNT/phobert-finetuned-viquad2" >> .env.local && \
+    echo "FINETUNE_KB_PATH=./models/knowledge_base.csv" >> .env.local
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -37,8 +39,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Tạo thư mục config và cấp quyền
-RUN mkdir config && chown nextjs:nodejs config
+# Tạo thư mục config và models, cấp quyền
+RUN mkdir config models && chown nextjs:nodejs config models
 
 COPY --from=builder /app/public ./public
 

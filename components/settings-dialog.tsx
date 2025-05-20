@@ -9,20 +9,22 @@ import { Button } from "@/components/ui/button"
 import { defaultModels } from "@/lib/models"
 import { useToast } from "@/hooks/use-toast"
 import { loadAllApiKeys, loadApiKey, saveAllApiKeys } from "@/lib/api-storage"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Download } from "lucide-react"
 
 interface SettingsDialogProps {
   isOpen: boolean
   onClose: () => void
 }
 
+const KNOWLEDGE_BASE_URL = "https://drive.google.com/uc?export=download&id=1s9hiyVUjmfBC3L_vJZAUzQolvWW4iGGW";
+
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const { toast } = useToast()
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({})
   const [authorName, setAuthorName] = useState("Your Name")
-  const [n8nApiUrl, setN8nApiUrl] = useState("")
   const [finetuneModelPath, setFinetuneModelPath] = useState("")
   const [finetuneKbPath, setFinetuneKbPath] = useState("")
+  const [isDownloading, setIsDownloading] = useState(false)
 
   // Load API keys khi component mount
   useEffect(() => {
@@ -37,8 +39,6 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       if (savedAuthorName) {
         setAuthorName(savedAuthorName)
       }
-      const savedN8nApiUrl = localStorage.getItem("N8N_API_URL")
-      if (savedN8nApiUrl) setN8nApiUrl(savedN8nApiUrl)
       const savedFinetuneModelPath = localStorage.getItem("FINETUNE_MODEL_PATH")
       if (savedFinetuneModelPath) setFinetuneModelPath(savedFinetuneModelPath)
       const savedFinetuneKbPath = localStorage.getItem("FINETUNE_KB_PATH")
@@ -49,7 +49,6 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const handleSaveSettings = async () => {
     saveAllApiKeys(apiKeys)
     localStorage.setItem("ai_models_chatbox_author_name", authorName)
-    localStorage.setItem("N8N_API_URL", n8nApiUrl)
     localStorage.setItem("FINETUNE_MODEL_PATH", finetuneModelPath)
     localStorage.setItem("FINETUNE_KB_PATH", finetuneKbPath)
 
@@ -69,6 +68,34 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       description: "Your API keys and preferences have been saved successfully.",
     })
     onClose()
+  }
+
+  const handleDownloadModels = async () => {
+    try {
+      setIsDownloading(true);
+      // Gọi API mới để tải knowledge_base.csv từ Google Drive
+      const response = await fetch("/api/download-knowledge-base", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to download knowledge base");
+      }
+      setFinetuneKbPath("./models/knowledge_base.csv");
+      toast({
+        title: "Knowledge base downloaded",
+        description: "File knowledge_base.csv đã được tải thành công.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Download failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   }
 
   const handleApiKeyChange = (modelId: string, value: string) => {
@@ -126,8 +153,73 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                   />
                 </div>
               ))}
+
+              {/* Fine-tuned Model Path */}
+              <div className="space-y-2">
+                <Label htmlFor="finetune-model-path">Fine-tuned Model Path</Label>
+                <Input
+                  id="finetune-model-path"
+                  placeholder="./phobert-finetuned-viquad2"
+                  value={finetuneModelPath}
+                  disabled
+                />
+                <p className="text-sm text-muted-foreground">Path to the fine-tuned model</p>
+              </div>
+
+              {/* Knowledge Base Path */}
+              <div className="space-y-2">
+                <Label htmlFor="finetune-kb-path">Knowledge Base Path</Label>
+                <Input
+                  id="finetune-kb-path"
+                  placeholder="./models/knowledge_base.csv"
+                  value={finetuneKbPath}
+                  disabled
+                />
+                <p className="text-sm text-muted-foreground">Path to the knowledge base file</p>
+              </div>
+
+              {/* HF_TOKEN */}
+              <div className="space-y-2">
+                <Label htmlFor="hf-token">HF_TOKEN</Label>
+                <Input
+                  id="hf-token"
+                  placeholder="Enter your HF_TOKEN"
+                  value={apiKeys["HF_TOKEN"] || ""}
+                  onChange={(e) => handleApiKeyChange("HF_TOKEN", e.target.value)}
+                />
+              </div>
+
+              {/* HF_MODEL_ID */}
+              <div className="space-y-2">
+                <Label htmlFor="hf-model-id">HF_MODEL_ID</Label>
+                <Input
+                  id="hf-model-id"
+                  placeholder="An-CNT/phobert-finetuned-viquad2"
+                  value={apiKeys["HF_MODEL_ID"] || "An-CNT/phobert-finetuned-viquad2"}
+                  disabled
+                />
+              </div>
+
+              {/* FINETUNE_KB_PATH */}
+              <div className="space-y-2">
+                <Label htmlFor="finetune-kb-path">FINETUNE_KB_PATH</Label>
+                <Input
+                  id="finetune-kb-path"
+                  placeholder="./models/knowledge_base.csv"
+                  value={apiKeys["FINETUNE_KB_PATH"] || "./models/knowledge_base.csv"}
+                  disabled
+                />
+              </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-2">
+              <Button
+                onClick={handleDownloadModels}
+                disabled={isDownloading}
+                variant="outline"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {isDownloading ? "Downloading..." : "Download Models"}
+              </Button>
               <Button onClick={handleSaveSettings}>Save Settings</Button>
             </div>
           </TabsContent>
@@ -141,36 +233,6 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="n8n-api-url">N8N API URL</Label>
-              <Input
-                id="n8n-api-url"
-                placeholder="Enter N8N webhook URL"
-                value={n8nApiUrl}
-                onChange={(e) => setN8nApiUrl(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">Used for Domain-based Chatbox</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="finetune-model-path">Fine-tuned Model Path</Label>
-              <Input
-                id="finetune-model-path"
-                placeholder="./phobert-finetuned-viquad2"
-                value={finetuneModelPath}
-                onChange={(e) => setFinetuneModelPath(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">Path to the fine-tuned model</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="finetune-kb-path">Knowledge Base Path</Label>
-              <Input
-                id="finetune-kb-path"
-                placeholder="./knowledge_base.csv"
-                value={finetuneKbPath}
-                onChange={(e) => setFinetuneKbPath(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">Path to the knowledge base file</p>
             </div>
             <div className="flex justify-end">
               <Button onClick={handleSaveSettings}>Save Settings</Button>

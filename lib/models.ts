@@ -3,6 +3,14 @@ import { Bot, BrainCircuit, Sparkles, MessageSquare, Cpu, Zap, Github, Code, Glo
 
 export const defaultModels: AIModel[] = [
   {
+    id: "general",
+    name: "General API Chatbox",
+    description: "AIMLAPI for general chat and completions",
+    icon: MessageSquare,
+    apiKeyName: "AIMLAPI_API_KEY",
+    websiteUrl: "https://aimlapi.com/",
+  },
+  {
     id: "openai",
     name: "ChatGPT",
     description: "OpenAI's GPT models for general purpose chat and content generation",
@@ -24,7 +32,7 @@ export const defaultModels: AIModel[] = [
     description: "xAI's Grok model for conversational AI",
     icon: Zap,
     apiKeyName: "GROK_API_KEY",
-    websiteUrl: "https://grok.x.ai/",
+    websiteUrl: "https://grok.com/chat",
   },
   {
     id: "v0",
@@ -49,7 +57,7 @@ export const defaultModels: AIModel[] = [
     description: "DeepSeek's language models for various tasks",
     icon: Cpu,
     apiKeyName: "DEEPSEEK_API_KEY",
-    websiteUrl: "https://deepseek.ai/",
+    websiteUrl: "https://chat.deepseek.com/",
   },
   {
     id: "copilot",
@@ -71,7 +79,7 @@ export const defaultModels: AIModel[] = [
   },
   {
     id: "domain",
-    name: "N8N API URL",
+    name: "Domain-based API Chatbox",
     description: "N8N webhook URL for domain-specific tasks",
     icon: Globe,
     apiKeyName: "N8N_API_URL",

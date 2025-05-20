@@ -16,13 +16,19 @@ export async function POST(req: NextRequest) {
     envContent = fs.readFileSync(ENV_PATH, 'utf-8');
   }
 
-  // Lấy tên biến môi trường đúng chuẩn
-  const envKey = model.toUpperCase() + '_API_KEY';
+  // Xử lý đặc biệt cho N8N API URL
+  const envKey = model === 'domain' ? 'N8N_WEBHOOK_URL' : model.toUpperCase() + '_API_KEY';
   const regex = new RegExp(`^${envKey}=.*$`, 'm');
+  
   if (regex.test(envContent)) {
     envContent = envContent.replace(regex, `${envKey}=${apiKey}`);
   } else {
     envContent += `\n${envKey}=${apiKey}`;
+  }
+
+  // Khi nhận key là HF_MODEL_ID, FINETUNE_KB_PATH, HF_TOKEN thì cập nhật hoặc thêm mới vào .env.local
+  if (model === 'HF_MODEL_ID' || model === 'FINETUNE_KB_PATH' || model === 'HF_TOKEN') {
+    envContent += `\n${model}=${apiKey}`;
   }
 
   fs.writeFileSync(ENV_PATH, envContent.trim() + '\n', 'utf-8');
