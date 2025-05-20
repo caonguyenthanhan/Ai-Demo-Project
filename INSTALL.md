@@ -22,29 +22,45 @@ yarn install
 pnpm install
 ```
 
-### 3. Tạo file môi trường
-Tạo file `.env.local` trong thư mục gốc của dự án:
-
+### 3. Tạo cấu trúc thư mục và file cấu hình
 ```powershell
-# Windows PowerShell
-New-Item .env.local -ItemType File
+# Tạo thư mục config
+New-Item -ItemType Directory -Path config -Force
 
-# Hoặc tạo file trống với nội dung mặc định
+# Tạo file api-keys.ts trong thư mục config
 @"
-# Các API keys có thể được cấu hình ở đây hoặc thông qua giao diện Settings
-OPENAI_API_KEY=
-GEMINI_API_KEY=
-GROK_API_KEY=
-CLAUDE_API_KEY=
-DEEPSEEK_API_KEY=
-"@ | Out-File -FilePath .env.local -Encoding UTF8
-```
+export interface ApiKeysConfig {
+  openai: string;
+  gemini: string;
+  grok: string;
+  v0: string;
+  claude: string;
+  deepseek: string;
+  copilot: string;
+  cursor: string;
+}
 
-Lưu ý:
-- File `.env.local` có thể để trống
-- Bạn có thể cấu hình API keys thông qua giao diện Settings của ứng dụng
-- Các API keys được lưu an toàn trong localStorage của trình duyệt
-- Bạn có thể thay đổi API keys bất kỳ lúc nào thông qua Settings
+const API_KEYS: ApiKeysConfig = {
+  openai: "",
+  gemini: "",
+  grok: "",
+  v0: "",
+  claude: "",
+  deepseek: "",
+  copilot: "",
+  cursor: "",
+};
+
+export const updateApiKey = (model: keyof ApiKeysConfig, key: string) => {
+  API_KEYS[model] = key;
+};
+
+export default API_KEYS;
+"@ | Out-File -FilePath config/api-keys.ts -Encoding UTF8
+
+# Tạo file .env.local
+New-Item .env.local -ItemType File
+```
 
 ### 4. Chạy ứng dụng ở môi trường development
 ```powershell
@@ -91,6 +107,12 @@ PORT=3001
 - Kiểm tra lại các API keys trong file `.env.local`
 - Đảm bảo các API keys có quyền truy cập hợp lệ
 - Hoặc cấu hình API keys thông qua giao diện Settings
+
+### 4. Lỗi Module not found
+Nếu gặp lỗi "Module not found", hãy kiểm tra:
+- Thư mục `config` đã được tạo chưa
+- File `api-keys.ts` đã tồn tại trong thư mục `config` chưa
+- Nội dung file `api-keys.ts` đã đúng chưa
 
 ## Liên hệ hỗ trợ
 Nếu bạn gặp vấn đề trong quá trình cài đặt, vui lòng:
