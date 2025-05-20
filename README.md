@@ -264,7 +264,7 @@ Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LI
 ## Tác giả
 
 - **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/caonguyenthanhan)
-- **Cao Nguyễn Thành An** - [GitHub Profile](https://github.com/caonguyenthanhan)
+- **Đào Minh Hoàng** - [GitHub Profile](https://github.com/minhhoang15)
 
 ## Lời cảm ơn
 
