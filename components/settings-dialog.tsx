@@ -52,20 +52,19 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     localStorage.setItem("FINETUNE_MODEL_PATH", finetuneModelPath)
     localStorage.setItem("FINETUNE_KB_PATH", finetuneKbPath)
 
-    // Gửi từng API key lên backend để lưu vào .env.local
-    for (const [model, apiKey] of Object.entries(apiKeys)) {
-      if (apiKey) {
-        await fetch("/api/save-api-key", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model, apiKey })
-        })
-      }
-    }
+    // Gửi toàn bộ API key lên backend để reset .env.local
+    const res = await fetch("/api/save-api-key", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ allApiKeys: apiKeys })
+    })
+    const data = await res.json()
 
     toast({
       title: "Settings saved",
-      description: "Your API keys and preferences have been saved successfully.",
+      description: data.restartRequired
+        ? "API keys đã được cập nhật. Vui lòng restart lại server để áp dụng thay đổi."
+        : "Your API keys and preferences have been saved successfully.",
     })
     onClose()
   }

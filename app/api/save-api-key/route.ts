@@ -5,33 +5,29 @@ import path from 'path';
 const ENV_PATH = path.resolve(process.cwd(), '.env.local');
 
 export async function POST(req: NextRequest) {
-  const { model, apiKey } = await req.json();
+  const { allApiKeys } = await req.json();
 
-  if (!model || !apiKey) {
-    return NextResponse.json({ error: 'Missing model or apiKey' }, { status: 400 });
+  if (!allApiKeys || typeof allApiKeys !== 'object') {
+    return NextResponse.json({ error: 'Missing allApiKeys object' }, { status: 400 });
   }
 
-  let envContent = '';
+  // Xóa file .env.local nếu tồn tại
   if (fs.existsSync(ENV_PATH)) {
-    envContent = fs.readFileSync(ENV_PATH, 'utf-8');
+    fs.unlinkSync(ENV_PATH);
   }
 
-  // Xử lý đặc biệt cho N8N API URL
-  const envKey = model === 'domain' ? 'N8N_WEBHOOK_URL' : model.toUpperCase() + '_API_KEY';
-  const regex = new RegExp(`^${envKey}=.*$`, 'm');
-  
-  if (regex.test(envContent)) {
-    envContent = envContent.replace(regex, `${envKey}=${apiKey}`);
-  } else {
-    envContent += `\n${envKey}=${apiKey}`;
+  // Ghi lại tất cả API key từ Settings UI
+  let envContent = '';
+  for (const [model, apiKey] of Object.entries(allApiKeys)) {
+    if (!apiKey) continue;
+    let envKey = model === 'domain' ? 'N8N_WEBHOOK_URL' : model.toUpperCase() + '_API_KEY';
+    if (model === 'HF_MODEL_ID' || model === 'FINETUNE_KB_PATH' || model === 'HF_TOKEN') {
+      envKey = model;
+    }
+    envContent += `${envKey}=${apiKey}\n`;
   }
-
-  // Khi nhận key là HF_MODEL_ID, FINETUNE_KB_PATH, HF_TOKEN thì cập nhật hoặc thêm mới vào .env.local
-  if (model === 'HF_MODEL_ID' || model === 'FINETUNE_KB_PATH' || model === 'HF_TOKEN') {
-    envContent += `\n${model}=${apiKey}`;
-  }
-
   fs.writeFileSync(ENV_PATH, envContent.trim() + '\n', 'utf-8');
 
-  return NextResponse.json({ success: true });
+  // Trả về yêu cầu restart server cho frontend
+  return NextResponse.json({ success: true, restartRequired: true });
 } 

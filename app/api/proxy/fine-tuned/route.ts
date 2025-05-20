@@ -28,18 +28,30 @@ function readKnowledgeBase(kbPath: string): any[] {
   return parse(csv, { columns: true });
 }
 
-// Gọi endpoint Python backend (app.py)
-async function askQuestionPythonAPI(question: string, context: string) {
-  const API_URL = process.env.FINETUNE_PY_API_URL || "http://localhost:8000/fine-tuned";
-  const payload = { question, context };
+// Gọi Hugging Face Inference API
+async function askQuestionHF(modelId: string, token: string, question: string, context: string) {
+  const API_URL = `https://api-inference.huggingface.co/models/${modelId}`;
+  const headers = {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json"
+  };
+  const payload = {
+    inputs: {
+      question,
+      context
+    },
+    options: {
+      wait_for_model: true
+    }
+  };
   const response = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload)
   });
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Python API error: ${errorText}`);
+    throw new Error(`HuggingFace API error: ${errorText}`);
   }
   return response.json();
 }
@@ -48,14 +60,20 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
     const userMessage = messages[messages.length - 1].content;
-    const sessionId = "fine-tuned-chat"; // Có thể thay đổi thành ID session thực tế
+    const sessionId = "fine-tuned-chat";
 
-    // TODO: Thay bằng giá trị thực tế hoặc lấy từ biến môi trường
-    const MODEL_ID = process.env.HF_MODEL_ID || "deepset/roberta-base-squad2";
-    const HF_TOKEN = process.env.HF_TOKEN || "";
-    const kbPath = process.env.FINETUNE_KB_PATH || "./models/knowledge_base.csv";
+    const MODEL_ID = "timpal0l/mdeberta-v3-base-squad2";
+    const HF_TOKEN = process.env.HF_TOKEN || process.env.HF_TOKEN_API_KEY || "";
+    const kbPath = "./models/knowledge_base.csv";
+
+    if (!MODEL_ID || !HF_TOKEN) {
+      return NextResponse.json({ error: "Thiếu HF_MODEL_ID hoặc HF_TOKEN. Vui lòng kiểm tra cấu hình API key." }, { status: 500 });
+    }
+    if (!fs.existsSync(kbPath)) {
+      return NextResponse.json({ error: `Không tìm thấy knowledge base tại ${kbPath}` }, { status: 500 });
+    }
+
     const kb = readKnowledgeBase(kbPath);
-
     const category = classifyQuestion(userMessage);
     const context = getContextFromKB(category, kb);
 
@@ -67,14 +85,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const hfResult = await askQuestionPythonAPI(userMessage, context);
-    // Kết quả trả về có thể khác nhau tùy model, cần kiểm tra trường 'answer' và 'score'
+    let hfResult = await askQuestionHF(MODEL_ID, HF_TOKEN, userMessage, context);
+    // Nếu trả về là mảng, lấy phần tử đầu tiên
+    if (Array.isArray(hfResult)) {
+      hfResult = hfResult[0] || {};
+    }
     return NextResponse.json({
-      response: hfResult.answer || JSON.stringify(hfResult),
-      confidence: hfResult.score || 0.0,
+      answer: hfResult.answer || "",
+      score: hfResult.score || 0.0,
+      start: hfResult.start,
+      end: hfResult.end,
       category
     });
   } catch (error: any) {
+    console.error("[Fine-tuned API]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 } 

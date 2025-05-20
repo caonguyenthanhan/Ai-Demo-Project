@@ -25,13 +25,14 @@ export async function callFineTunedAPI(messages: any[]) {
 
     const result = await response.json();
     
-    // Trả về message từ response
-    if (result.message) {
-      return result.message;
+    // Trả về answer nếu có, nếu không trả về toàn bộ response dạng JSON
+    if (result.answer) {
+      return result.answer;
     }
-    
-    // Fallback cho các trường hợp khác
-    return result.content || result.choices?.[0]?.message?.content || "Không có phản hồi từ server";
+    if (result.response) {
+      return result.response;
+    }
+    return JSON.stringify(result);
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw new Error('Request timeout after 30 seconds');

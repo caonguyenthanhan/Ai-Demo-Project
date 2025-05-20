@@ -93,4 +93,12 @@ export const defaultModels: AIModel[] = [
     apiKeyName: "AIMLAPI_API_KEY",
     websiteUrl: "https://aimlapi.com/",
   },
+  {
+    id: "finetuned",
+    name: "Fine-tuned Chatbox",
+    description: "Hugging Face Inference API cho mô hình fine-tuned tiếng Việt (PhoBERT Viquad2)",
+    icon: BrainCircuit,
+    apiKeyName: "HF_TOKEN",
+    websiteUrl: "https://huggingface.co/An-CNT/phobert-finetuned-viquad2",
+  },
 ]
