@@ -1,3 +1,5 @@
+# Chatbox
+
 ##  General API Chatbox sử dụng api của AIMLAPI API Key
 https://aimlapi.com/app/keys/
 
@@ -11,7 +13,11 @@ nguồn dữ liệu:  [data_Project_NLP](https://docs.google.com/spreadsheets/d/
 
 ##  Fine-tuned Chatbox
 sử dụng mô hình Fine-tuned: phobert-finetuned-viquad2 và nguồn học knowledge_base.csv
-###bạn có thể tải chúng ở: [Fine-tuned Chatbox](https://drive.google.com/drive/folders/1vi95ZM9cfAD75l1NpoMjEo-X4wQZperD?usp=sharing)
+### bạn có thể tải chúng ở: 
+[Fine-tuned Chatbox](https://drive.google.com/drive/folders/1vi95ZM9cfAD75l1NpoMjEo-X4wQZperD?usp=sharing)
+Fine-tuned mô hình: [Fine-tuning PhoBERT cho Hỏi-Đáp Tiếng Việt với UIT-ViQuAD 2.0](https://colab.research.google.com/drive/1k6F32nabwB6ga6Tesr586woh8EvsU3TA?usp=sharing)
+
+# Api Chatbox
 
 ##  OPENAI_API_KEY
 https://platform.openai.com/api-keys
