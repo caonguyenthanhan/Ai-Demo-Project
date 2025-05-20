@@ -98,13 +98,13 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
           <TabsContent value="api-keys" className="space-y-4 mt-4">
             <div className="max-h-[60vh] overflow-y-auto space-y-4">
-              {defaultModels.map((model) => (
+              {defaultModels.filter(model => !model.redirectToWebsite && model.apiKeyName).map((model) => (
                 <div key={model.id} className="space-y-2">
                   <Label htmlFor={`api-key-${model.id}`}>
                     <div className="flex items-center">
                       <model.icon className="h-4 w-4 mr-2" />
-                      {model.name} API Key
-                      {model.redirectToWebsite && model.websiteUrl && (
+                      {model.name}
+                      {model.websiteUrl && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -117,19 +117,13 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                       )}
                     </div>
                   </Label>
-                  {model.redirectToWebsite ? (
-                    <div className="text-sm text-muted-foreground italic">
-                      {model.name} không cung cấp API key công khai. Vui lòng truy cập trang web chính thức để sử dụng.
-                    </div>
-                  ) : (
-                    <Input
-                      id={`api-key-${model.id}`}
-                      type="password"
-                      placeholder={`Enter your ${model.name} API key`}
-                      value={apiKeys[model.id] || ""}
-                      onChange={(e) => handleApiKeyChange(model.id, e.target.value)}
-                    />
-                  )}
+                  <Input
+                    id={`api-key-${model.id}`}
+                    type="password"
+                    placeholder={`Enter your ${model.name}`}
+                    value={apiKeys[model.id] || ""}
+                    onChange={(e) => handleApiKeyChange(model.id, e.target.value)}
+                  />
                 </div>
               ))}
             </div>
@@ -149,31 +143,34 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="n8n-api-url">N8N_API_URL</Label>
+              <Label htmlFor="n8n-api-url">N8N API URL</Label>
               <Input
                 id="n8n-api-url"
-                placeholder="Enter N8N API URL"
+                placeholder="Enter N8N webhook URL"
                 value={n8nApiUrl}
                 onChange={(e) => setN8nApiUrl(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground">Used for Domain-based Chatbox</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="finetune-model-path">FINETUNE_MODEL_PATH</Label>
+              <Label htmlFor="finetune-model-path">Fine-tuned Model Path</Label>
               <Input
                 id="finetune-model-path"
-                placeholder="Enter Fine-tune Model Path"
+                placeholder="./phobert-finetuned-viquad2"
                 value={finetuneModelPath}
                 onChange={(e) => setFinetuneModelPath(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground">Path to the fine-tuned model</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="finetune-kb-path">FINETUNE_KB_PATH</Label>
+              <Label htmlFor="finetune-kb-path">Knowledge Base Path</Label>
               <Input
                 id="finetune-kb-path"
-                placeholder="Enter Fine-tune Knowledge Base Path"
+                placeholder="./knowledge_base.csv"
                 value={finetuneKbPath}
                 onChange={(e) => setFinetuneKbPath(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground">Path to the knowledge base file</p>
             </div>
             <div className="flex justify-end">
               <Button onClick={handleSaveSettings}>Save Settings</Button>

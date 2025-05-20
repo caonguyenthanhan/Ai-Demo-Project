@@ -88,36 +88,38 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=your_openai_api_key ai-models-chatbox
 
 ## Cấu hình API Keys
 
-Dự án này hỗ trợ nhiều cách để cấu hình API keys, bạn có thể lấy api theo hướng dẫn ở [link api.txt](link%20api.txt)
+Dự án này hỗ trợ nhiều cách để cấu hình API keys:
 
-### 1. Thông qua file cấu hình
-
-Bạn có thể chỉnh sửa trực tiếp file `config/api-keys.ts`:
-
-```typescript
-const API_KEYS: ApiKeysConfig = {
-  openai: "your_openai_api_key",
-  gemini: "your_gemini_api_key",
-  grok: "your_grok_api_key",
-  v0: "", // V0 không có API key công khai
-  claude: "your_claude_api_key",
-  deepseek: "your_deepseek_api_key",
-  copilot: "", // Copilot không có API key công khai
-  cursor: "", // Cursor không có API key công khai
-};
-```
-
-### 2. Thông qua giao diện cài đặt
+### 1. Thông qua giao diện Settings
 
 1. Nhấp vào nút "Settings" trong sidebar
 2. Chuyển đến tab "API Keys"
-3. Nhập API keys của bạn cho các mô hình tương ứng
-4. Nhấp vào "Save Settings"
+3. Nhập các API keys tương ứng:
+   - **ChatGPT**: API key từ OpenAI
+   - **Gemini**: API key từ Google AI Studio
+   - **Grok**: API key từ X.AI
+   - **Claude AI**: API key từ Anthropic
+   - **DeepSeek**: API key từ DeepSeek
+   - **AIMLAPI**: API key từ AIMLAPI (Sử dụng cho General API Chatbox)
+   - **N8N API URL**: Webhook URL từ n8n (Sử dụng cho Domain-based Chatbox)
 
+4. Trong tab "Preferences", bạn có thể cấu hình:
+   - **Author Name**: Tên tác giả hiển thị trên sidebar
+   - **N8N_API_URL**: URL webhook của n8n cho Domain-based Chatbox
+   - **FINETUNE_MODEL_PATH**: Đường dẫn đến mô hình fine-tuned (mặc định: ./phobert-finetuned-viquad2)
+   - **FINETUNE_KB_PATH**: Đường dẫn đến file knowledge base (mặc định: ./knowledge_base.csv)
 
-API keys sẽ được lưu vào localStorage của trình duyệt.
+5. Nhấp "Save Settings" để lưu cấu hình
 
-### 3. Thông qua biến môi trường
+Lưu ý:
+- API keys sẽ được lưu an toàn trong localStorage của trình duyệt
+- Các keys cũng được tự động lưu vào file `.env.local` để backend sử dụng
+- Một số mô hình (v0, Copilot, Cursor) không yêu cầu API key và sẽ chuyển hướng đến trang web chính thức
+- General API Chatbox sử dụng AIMLAPI
+- Domain-based Chatbox sử dụng N8N webhook
+- Fine-tuned Chatbox sử dụng mô hình local, không cần API key
+
+### 2. Thông qua file .env.local
 
 Bạn có thể cấu hình API keys thông qua biến môi trường:
 

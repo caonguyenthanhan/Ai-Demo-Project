@@ -3,7 +3,7 @@ import 'dotenv/config';
 import axios from 'axios';
 
 // Lấy N8N_WEBHOOK_URL từ biến môi trường
-const N8N_WEBHOOK_URL = process.env.DOMAIN_API_KEY;
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
 export async function GET(req: NextRequest) {
   try {

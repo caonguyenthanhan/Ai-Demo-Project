@@ -1,5 +1,5 @@
 import type { AIModel } from "@/lib/types"
-import { Bot, BrainCircuit, Sparkles, MessageSquare, Cpu, Zap, Github, Code } from "lucide-react"
+import { Bot, BrainCircuit, Sparkles, MessageSquare, Cpu, Zap, Github, Code, Globe } from "lucide-react"
 
 export const defaultModels: AIModel[] = [
   {
@@ -70,27 +70,11 @@ export const defaultModels: AIModel[] = [
     redirectToWebsite: true, // Chỉ định rằng nên chuyển hướng đến trang web
   },
   {
-    id: "general",
-    name: "General",
-    description: "General AI chatbox for basic conversations",
-    icon: Sparkles,
-    apiKeyName: "",
-    websiteUrl: "",
-  },
-  {
     id: "domain",
-    name: "Domain",
-    description: "Domain-based AI chatbox for specialized tasks",
-    icon: BrainCircuit,
-    apiKeyName: "",
-    websiteUrl: "",
-  },
-  {
-    id: "finetuned",
-    name: "Fine-tuned Model",
-    description: "Fine-tuned AI chatbox for custom tasks",
-    icon: Bot,
-    apiKeyName: "",
+    name: "N8N API URL",
+    description: "N8N webhook URL for domain-specific tasks",
+    icon: Globe,
+    apiKeyName: "N8N_API_URL",
     websiteUrl: "",
   },
   {
