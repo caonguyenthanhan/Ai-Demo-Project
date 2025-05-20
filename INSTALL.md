@@ -13,7 +13,7 @@ git clone https://github.com/caonguyenthanhan/Ai-Demo-Project
 cd Ai-Demo-Project
 ```
 
-### 2. Cài đặt dependencies
+### 2. Cài đặt dependencies (BẮT BUỘC)
 ```powershell
 npm install
 # hoặc
@@ -113,6 +113,25 @@ Nếu gặp lỗi "Module not found", hãy kiểm tra:
 - Thư mục `config` đã được tạo chưa
 - File `api-keys.ts` đã tồn tại trong thư mục `config` chưa
 - Nội dung file `api-keys.ts` đã đúng chưa
+
+### 5. Lỗi 'next' is not recognized
+Nếu gặp lỗi này, hãy thực hiện các bước sau:
+1. Xóa thư mục node_modules:
+```powershell
+rm -rf node_modules
+```
+2. Xóa file package-lock.json:
+```powershell
+rm package-lock.json
+```
+3. Cài đặt lại dependencies:
+```powershell
+npm install
+```
+4. Chạy lại ứng dụng:
+```powershell
+npm run dev
+```
 
 ## Liên hệ hỗ trợ
 Nếu bạn gặp vấn đề trong quá trình cài đặt, vui lòng:

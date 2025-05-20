@@ -46,12 +46,24 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     }
   }, [isOpen])
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     saveAllApiKeys(apiKeys)
     localStorage.setItem("ai_models_chatbox_author_name", authorName)
     localStorage.setItem("N8N_API_URL", n8nApiUrl)
     localStorage.setItem("FINETUNE_MODEL_PATH", finetuneModelPath)
     localStorage.setItem("FINETUNE_KB_PATH", finetuneKbPath)
+
+    // Gửi từng API key lên backend để lưu vào .env.local
+    for (const [model, apiKey] of Object.entries(apiKeys)) {
+      if (apiKey) {
+        await fetch("/api/save-api-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model, apiKey })
+        })
+      }
+    }
+
     toast({
       title: "Settings saved",
       description: "Your API keys and preferences have been saved successfully.",
