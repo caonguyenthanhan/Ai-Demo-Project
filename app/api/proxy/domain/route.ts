@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
+import 'dotenv/config';
+import axios from 'axios';
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "YOUR_GEMINI_API_KEY";
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,7 +17,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Gọi n8n webhook với query parameters
-    const n8nUrl = new URL("https://nlppro.app.n8n.cloud/webhook/chatbot-response");
+    const n8nUrl = new URL(N8N_WEBHOOK_URL);
     n8nUrl.searchParams.append("message", message);
     n8nUrl.searchParams.append("sessionId", sessionId);
 
