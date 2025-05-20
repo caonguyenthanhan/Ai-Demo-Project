@@ -28,7 +28,7 @@ https://console.anthropic.com/dashboard
 ##  DEEPSEEK_API_KEY
 https://platform.deepseek.com/api_keys
 
-##  V0
+##  vo by Vercel
 https://v0.dev/
 
 ##  COPILOT
