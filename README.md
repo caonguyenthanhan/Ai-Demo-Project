@@ -86,7 +86,7 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=your_openai_api_key ai-models-chatbox
 
 ## Cấu hình API Keys
 
-Dự án này hỗ trợ nhiều cách để cấu hình API keys:
+Dự án này hỗ trợ nhiều cách để cấu hình API keys, bạn có thể lấy api theo hướng dẫn ở [.\link api.txt](.\link api.txt)
 
 ### 1. Thông qua file cấu hình
 
