@@ -24,6 +24,8 @@ Dự án này cung cấp một giao diện chat thống nhất cho phép ngườ
 
 ### Cài đặt từ nguồn
 
+Xem hướng dẫn chi tiết tại [INSTALL.md](INSTALL.md)
+
 1. Clone repository:
    ```bash
    git clone https://github.com/caonguyenthanhan/Ai-Demo-Project
