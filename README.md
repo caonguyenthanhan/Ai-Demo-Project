@@ -1,7 +1,5 @@
 # AI Models Unified Chatbox
 
-![AI Models Chatbox](https://placeholder.svg?height=200&width=600)
-
 Một giao diện thống nhất để tương tác với nhiều mô hình ngôn ngữ AI khác nhau, bao gồm ChatGPT, Gemini, Grok, v0 by Vercel, Claude AI, DeepSeek, Copilot, và Cursor.
 
 ## Tổng quan
@@ -28,8 +26,8 @@ Dự án này cung cấp một giao diện chat thống nhất cho phép ngườ
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/your-username/ai-models-chatbox.git
-   cd ai-models-chatbox
+   git clone https://github.com/caonguyenthanhan/Ai-Demo-Project
+   cd Ai-Demo-Project
 
 2. Cài đặt các dependencies:
 
