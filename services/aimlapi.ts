@@ -6,6 +6,12 @@ export async function callAIMLAPI(messages: any[]) {
     throw new Error("AIMLAPI API key not found. Please add your API key in settings.")
   }
 
+  // Lọc chỉ giữ lại role và content cho từng message
+  const cleanMessages = messages.map(msg => ({
+    role: msg.role,
+    content: msg.content
+  }));
+
   try {
     const response = await fetch("/api/proxy/aimlapi", {
       method: "POST",
@@ -13,7 +19,7 @@ export async function callAIMLAPI(messages: any[]) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
-      body: JSON.stringify({ messages })
+      body: JSON.stringify({ messages: cleanMessages })
     })
     const result = await response.json()
     if (!response.ok) throw new Error(result.error || "Unknown error")

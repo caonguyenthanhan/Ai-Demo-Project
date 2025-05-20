@@ -127,35 +127,46 @@ Bạn có thể cấu hình API keys thông qua biến môi trường:
 
 ## Cách sử dụng
 
-### Giao diện chính
+### Kiến trúc hệ thống
 
-1. **Sidebar**: Hiển thị danh sách các mô hình AI có sẵn
-2. **Chat Area**: Hiển thị lịch sử chat
-3. **Input Box**: Nhập tin nhắn của bạn
-4. **Settings**: Cấu hình API keys và tùy chọn khác
+Ứng dụng được xây dựng theo mô hình client-server với proxy backend:
 
+1. **Frontend (Next.js App Router)**
+   - Giao diện người dùng React với Tailwind CSS và shadcn/ui
+   - Quản lý trạng thái và tương tác người dùng
+   - Gọi API thông qua proxy backend
 
-### Chọn mô hình AI
+2. **Backend Proxy**
+   - Xử lý tất cả các yêu cầu API AI
+   - Bảo mật API keys
+   - Xử lý lỗi CORS/CSP
+   - Hỗ trợ nhiều mô hình AI
 
-Nhấp vào mô hình trong sidebar để chọn. Lưu ý:
+### Luồng hoạt động
 
-- Một số mô hình (V0, Copilot, Cursor) sẽ chuyển hướng đến trang web chính thức của chúng khi được nhấp vào
-- Các mô hình khác sẽ được chọn để sử dụng trong chat
+1. **Khởi tạo**
+   - Người dùng cấu hình API keys trong Settings
+   - Keys được lưu an toàn trong localStorage
+   - Backend proxy sử dụng keys từ biến môi trường
 
+2. **Tương tác**
+   - Người dùng chọn mô hình AI từ sidebar
+   - Nhập tin nhắn vào chat interface
+   - Frontend gửi request đến proxy backend
+   - Backend xử lý request với API key tương ứng
+   - Kết quả được trả về và hiển thị trong chat
 
-### Gửi tin nhắn
+3. **Xử lý đặc biệt**
+   - Các mô hình không có API công khai (V0, Copilot, Cursor) sẽ chuyển hướng đến trang web chính thức
+   - Mỗi mô hình có route proxy riêng: `/api/proxy/{model}`
+   - Lỗi được xử lý và hiển thị thân thiện với người dùng
 
-1. Nhập tin nhắn của bạn vào ô nhập liệu ở dưới cùng
-2. Nhấn Enter hoặc nhấp vào nút gửi
-3. Mô hình AI sẽ xử lý tin nhắn của bạn và trả lời
+### Bảo mật
 
-
-### Quản lý cài đặt
-
-1. Nhấp vào nút "Settings" trong sidebar
-2. Cấu hình API keys và tùy chọn khác
-3. Nhấp vào "Save Settings" để lưu thay đổi
-
+- API keys được lưu trữ an toàn trong biến môi trường server
+- Không có key nào được lộ ra frontend
+- Tất cả request đều đi qua proxy backend
+- Hỗ trợ HTTPS và các biện pháp bảo mật khác
 
 ## Cấu trúc dự án
 

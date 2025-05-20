@@ -3,47 +3,43 @@ import { loadApiKey } from "@/lib/api-storage"
 // app/api/proxy/aimlapi/route.ts
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-    const apiKey = req.headers.get("authorization"); // Lấy từ header
+    const body = await req.json();
+    const AIMLAPI_API_KEY = process.env.AIMLAPI_API_KEY;
 
-    if (!apiKey) {
-      return new Response(JSON.stringify({ error: "Missing API key" }), { status: 401 });
+    if (!AIMLAPI_API_KEY) {
+      return NextResponse.json(
+        { error: 'AIMLAPI_API_KEY is not configured' },
+        { status: 500 }
+      );
     }
 
-    // Lọc chỉ giữ lại role và content cho từng message
-    const cleanMessages = messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
-
-    const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": apiKey,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${AIMLAPI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: cleanMessages,
-        temperature: 0.7,
-        max_tokens: 1000,
+        model: body.model || "gpt-3.5-turbo",
+        messages: body.messages,
+        temperature: body.temperature || 0.7,
+        max_tokens: body.max_tokens || 1000
       }),
     });
 
-    const text = await response.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = { error: text };
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
-    if (!response.ok) {
-      return new Response(JSON.stringify({ error: data.error || text }), { status: response.status });
-    }
-    return new Response(JSON.stringify(data), { status: response.status });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    console.error('Error in aimlapi proxy:', error);
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 }
 

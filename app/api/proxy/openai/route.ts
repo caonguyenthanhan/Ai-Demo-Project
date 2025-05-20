@@ -1,30 +1,32 @@
 import { NextRequest, NextResponse } from "next/server"
+import OpenAI from 'openai'
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: "OpenAI API key not set on server." }, { status: 400 })
-    }
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: messages.map((msg: any) => ({ role: msg.role, content: msg.content }))
-      })
+    const body = await req.json()
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
     })
-    if (!response.ok) {
-      const errorText = await response.text()
-      return NextResponse.json({ error: errorText }, { status: response.status })
+
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY is not configured' },
+        { status: 500 }
+      )
     }
-    const result = await response.json()
-    return NextResponse.json({ content: result.choices?.[0]?.message?.content || "No response from OpenAI" })
+
+    const response = await openai.chat.completions.create({
+      model: body.model || "gpt-3.5-turbo",
+      messages: body.messages,
+      temperature: body.temperature || 0,
+    })
+
+    return NextResponse.json(response)
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error in openai proxy:', error)
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    )
   }
 } 

@@ -1,30 +1,51 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const { messages } = await req.json()
-    const apiUrl = process.env.N8N_API_URL || ""
+    const searchParams = req.nextUrl.searchParams;
+    const message = searchParams.get("message");
+    const sessionId = searchParams.get("sessionId");
 
-    const response = await fetch(`${apiUrl}/chat/domain`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ messages })
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+    if (!message || !sessionId) {
+      return NextResponse.json(
+        { error: "Message and sessionId are required" },
+        { status: 400 }
+      );
     }
 
-    const result = await response.json()
-    return NextResponse.json({ content: result.message })
-  } catch (error) {
-    console.error("Error in domain proxy:", error)
+    // Gọi n8n webhook với query parameters
+    const n8nUrl = new URL("https://nlppro.app.n8n.cloud/webhook/chatbot-response");
+    n8nUrl.searchParams.append("message", message);
+    n8nUrl.searchParams.append("sessionId", sessionId);
+
+    console.log(`[*] Đang gửi yêu cầu tới: ${n8nUrl.toString()}`);
+    console.log(`[*] Tham số: message=${message}, sessionId=${sessionId}`);
+
+    const response = await fetch(n8nUrl.toString(), {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store"
+    });
+
+    console.log(`[*] Mã trạng thái HTTP: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[!] Lỗi: ${errorText}`);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+    }
+
+    // Đọc response dưới dạng text
+    const responseText = await response.text();
+    console.log(`[*] Response text: ${responseText}`);
+
+    // Trả về response dưới dạng text trong object message
+    return NextResponse.json({ message: responseText });
+  } catch (error: any) {
+    console.error("Error in domain proxy:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
+      { error: error.message },
       { status: 500 }
-    )
+    );
   }
 } 

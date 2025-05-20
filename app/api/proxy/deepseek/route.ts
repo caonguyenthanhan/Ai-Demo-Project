@@ -2,35 +2,42 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
-    const apiKey = process.env.DEEPSEEK_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: "DeepSeek API key not set on server." }, { status: 400 })
+    const body = await req.json()
+    const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY
+
+    if (!DEEPSEEK_API_KEY) {
+      return NextResponse.json(
+        { error: 'DEEPSEEK_API_KEY is not configured' },
+        { status: 500 }
+      )
     }
-    const url = "https://api.deepseek.com/chat/completions"
-    const data = {
-      model: "deepseek-chat",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        ...messages.map((msg: any) => ({ role: msg.role, content: msg.content }))
-      ],
-      stream: false
-    }
-    const response = await fetch(url, {
-      method: "POST",
+
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        model: body.model || "deepseek-chat",
+        messages: body.messages,
+        stream: false,
+        temperature: body.temperature || 0,
+      }),
     })
+
     if (!response.ok) {
       const errorText = await response.text()
-      return NextResponse.json({ error: errorText }, { status: response.status })
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
     }
-    const result = await response.json()
-    return NextResponse.json({ content: result.choices?.[0]?.message?.content || "No response from DeepSeek" })
+
+    const data = await response.json()
+    return NextResponse.json(data)
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error in deepseek proxy:', error)
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    )
   }
 } 

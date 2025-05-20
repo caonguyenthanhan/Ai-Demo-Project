@@ -94,25 +94,20 @@ export function ChatInterface() {
         case "grok":
           response = await callGrok([...messages, userMessage])
           break
-        case "aiml":
-          response = await callAIMLAPI([...messages, userMessage], localStorage.getItem("AIMLAPI_API_KEY") ?? "")
+        case "aimlapi":
+          response = await callAIMLAPI([...messages, userMessage])
           break
         case "context":
-          response = await callContextAPI([...messages, userMessage], localStorage.getItem("N8N_API_URL") ?? "")
+          response = await callContextAPI([...messages, userMessage])
           break
         case "domain":
-          response = await callDomainAPI([...messages, userMessage], localStorage.getItem("N8N_API_URL") ?? "")
+          response = await callDomainAPI([...messages, userMessage])
           break
         case "finetuned":
-          response = await callFineTunedAPI(
-            [...messages, userMessage],
-            localStorage.getItem("N8N_API_URL") ?? "",
-            localStorage.getItem("FINETUNE_MODEL_PATH") ?? "",
-            localStorage.getItem("FINETUNE_KB_PATH") ?? ""
-          )
+          response = await callFineTunedAPI([...messages, userMessage])
           break
         case "general":
-          response = await callAIMLAPI([...messages, userMessage], localStorage.getItem("AIMLAPI_API_KEY") ?? "")
+          response = await callAIMLAPI([...messages, userMessage])
           break
         default:
           throw new Error(`Model ${selectedModel.id} is not supported yet.`)
